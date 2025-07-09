@@ -1,1 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ecoregion Lookup</title>
+</head>
+<body>
+    <h2>Enter Latitude and Longitude</h2>
+    <form id="ecoForm">
+        Latitude: <input type="text" id="latitude"><br><br>
+        Longitude: <input type="text" id="longitude"><br><br>
+        <button type="submit">Submit</button>
+        <button type="button" onclick="resetForm()">Reset</button>
+    </form>
 
+    <div id="result"></div>
+
+    <script>
+        function resetForm() {
+            document.getElementById("ecoForm").reset();
+            document.getElementById("result").innerHTML = "";
+        }
+
+        document.getElementById("ecoForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const lat = document.getElementById("latitude").value;
+            const lon = document.getElementById("longitude").value;
+
+            fetch('/get_ecoregion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = `
+                    <h3>Ecoregion:</h3>
+                    <p>Level 1: ${data.Level_1}</p>
+                    <p>Level 2: ${data.Level_2}</p>
+                    <p>Level 3: ${data.Level_3}</p>
+                    <p>Level 4: ${data.Level_4}</p>
+                `;
+            })
+            .catch(error => {
+                document.getElementById("result").innerHTML = `<p>Error: ${error}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
